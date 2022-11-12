@@ -1,6 +1,7 @@
 package com.YY.mp.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,15 @@ public class User {
     @TableId(type = IdType.AUTO)
     private Long id;
     private String userName;
-    private String password;
+
+    @TableField(select = false)
+    private String password;       //查询时不返回该字段的值
     private String name;
     private Integer age;
-    private String email;
+
+    @TableField("email")
+    private String mail;
+
+    @TableField(exist = false)
+    private String address; //数据库中不存在
 }

@@ -18,7 +18,7 @@ public class TestUserMapper {
     public void testInsert(){
         User user = new User();
         user.setAge(20);
-        user.setEmail("test@itcast.cn");
+        user.setMail("test@itcast.cn");
         user.setName("曹操");
         user.setUserName("caocao");
         user.setPassword("123456");
@@ -27,5 +27,22 @@ public class TestUserMapper {
         System.out.println("insert = " + insert);
 
         System.out.println("user.getId() = " + user.getId());//自增长id会回填到语句中
+    }
+
+    @Test
+    public void testSelectById(){
+        User user = this.userMapper.selectById(1L);
+        System.out.println("user = " + user);
+    }
+
+    @Test
+    public void testUpdateById(){
+        User user = new User();
+        user.setId(1L);
+        user.setAge(11);
+
+        int i = this.userMapper.updateById(user);
+
+        System.out.println("i = " + i);
     }
 }
