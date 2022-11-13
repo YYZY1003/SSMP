@@ -5,4 +5,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.boot.SpringBootConfiguration;
 
 public interface UserMapper extends BaseMapper<User> {
+
+    public User findById(Long id);
 }
