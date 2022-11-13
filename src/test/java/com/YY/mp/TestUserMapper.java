@@ -2,32 +2,40 @@ package com.YY.mp;
 
 import com.YY.mp.mapper.UserMapper;
 import com.YY.mp.pojo.User;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
+import java.util.HashMap;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TestUserMapper {
-    @Autowired
-    private UserMapper userMapper;
-
     @Test
     public void testInsert(){
-        User user = new User();
-        user.setAge(20);
-        user.setMail("test@itcast.cn");
-        user.setName("曹操");
-        user.setUserName("caocao");
-        user.setPassword("123456");
+        for (int i = 0; i < 5; i++) {
 
-        int insert = this.userMapper.insert(user);  //数据库受影响的行数
-        System.out.println("insert = " + insert);
+            User user = new User();
+            user.setAge(20+i);
+            user.setMail("test@itcast.cn");
+            user.setName("曹操"+i);
+            user.setUserName("caocao");
+            user.setPassword("123456");
 
-        System.out.println("user.getId() = " + user.getId());//自增长id会回填到语句中
-    }
+            int insert = this.userMapper.insert(user);  //数据库受影响的行数
+            System.out.println("insert = " + insert);
+
+            System.out.println("user.getId() = " + user.getId());//自增长id会回填到语句中
+
+        }}
+
+    @Autowired
+    private UserMapper userMapper;
 
     @Test
     public void testSelectById(){
@@ -44,5 +52,74 @@ public class TestUserMapper {
         int i = this.userMapper.updateById(user);
 
         System.out.println("i = " + i);
+    }
+
+    @Test
+    public void testUpdate(){
+        User user = new User();
+        user.setAge(11);
+        user.setPassword("9999");
+
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        QueryWrapper<User> userQueryWrapper = wrapper.eq("user_name", "zhangsan");//匹配name=zhangsan
+
+        //根据条件做更新
+        int i = this.userMapper.update(user,userQueryWrapper);
+
+        System.out.println("i = " + i);
+    }
+
+    @Test
+    public void testUpdate2(){
+        UpdateWrapper<User> wrapper = new UpdateWrapper<>();
+        UpdateWrapper<User> set = wrapper.set("age", 21).set("password", "8888888"). //更新的字段
+        eq("user_name","zhangsan");  //更新的条件
+
+        int i = this.userMapper.update(null,set);
+
+        System.out.println("i = " + i);
+    }
+
+    //删除操作
+    @Test
+    public void testDeleteById(){
+        int delete = this.userMapper.deleteById(1591507866319380483L);
+
+        System.out.println("delete = " + delete);
+    }
+
+    @Test
+    public void testDeleteByMap(){
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("user_name","caocao");
+        map.put("password", "123456");
+
+        //根据map删除数据 多条件时and关系
+        int result = this.userMapper.deleteByMap(map);
+        System.out.println("result = " + result);
+    }
+
+    @Test
+    public void testDelete(){
+
+//        QueryWrapper<User> wrapper = new QueryWrapper<>();
+//        QueryWrapper<User> eq = wrapper.eq("user_name", "caocao").eq("password", "123456"); //用法一
+        //根据条件包装删除
+//        int delete = this.userMapper.delete(eq);
+//        System.out.println("delete = " + delete);
+
+        User user = new User();
+        user.setPassword("123456");
+        user.setUserName("caocao");
+
+        QueryWrapper<User> wrapper = new QueryWrapper<>(user);
+        int delete = this.userMapper.delete(wrapper);
+        System.out.println("delete = " + delete);
+    }
+
+    @Test
+    public void testSelectBatchIds(){
+        int result = this.userMapper.deleteBatchIds(Arrays.asList(1591507866319380491L, 1591507866319380492L, 1591507866319380493L));
+        System.out.println("result = " + result);
     }
 }
