@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -140,19 +141,19 @@ public class TestUserMapper {
     }
 
     @Test
-    public void testSelectCount(){
+    public void testSelectCount() {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.gt("age",20);//岁数大于20
+        wrapper.gt("age", 20);//岁数大于20
 
         Integer selectCount = this.userMapper.selectCount(wrapper);
         System.out.println("selectCount = " + selectCount);
     }
 
     @Test
-    public void testSelectList(){
+    public void testSelectList() {
         QueryWrapper<User> wrapper = new QueryWrapper<>();
         //设置查询条件
-        wrapper.like("user_name","caocao");
+        wrapper.like("user_name", "caocao");
 
         List<User> users = this.userMapper.selectList(wrapper);
         for (User user : users) {
@@ -162,11 +163,11 @@ public class TestUserMapper {
 
     //分页查询
     @Test
-    public void testSelectPage(){
-        Page<User> page = new Page<>(1,1);//查询第一页第一条数据
+    public void testSelectPage() {
+        Page<User> page = new Page<>(1, 1);//查询第一页第一条数据
 
         QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.like("user_name","caocao");
+        wrapper.like("user_name", "caocao");
         IPage<User> iPage = this.userMapper.selectPage(page, wrapper);
         System.out.println("iPage.getTotal() = " + iPage.getTotal());
         System.out.println("iPage.getPages() = " + iPage.getPages());
@@ -179,8 +180,89 @@ public class TestUserMapper {
 
     //自定义的方法
     @Test
-    public void testFindById(){
+    public void testFindById() {
         User user = this.userMapper.findById(1L);
         System.out.println("user = " + user);
+    }
+
+    //allEq
+    @Test
+    public void testAllEq() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", "曹操");
+        params.put("age", "20");
+        params.put("password", null);
+
+
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+//        wrapper.allEq(params);
+//        wrapper.allEq(params,false);
+        wrapper.allEq((k, v) -> (k.equals("age") || k.equals("id")||k.equals("name")), params);
+
+        List<User> users = this.userMapper.selectList(wrapper);
+        for (User user : users) {
+            System.out.println("user = " + user);
+        }
+    }
+
+    @Test
+    public void testEq() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+//SELECT id,user_name,password,name,age,email FROM tb_user WHERE password = ? AND age >= ? AND name IN (?,?,?)
+        wrapper.eq("password", "123456")
+                .ge("age", 20)
+                .in("name", "李四", "王五", "赵六");
+        List<User> users = this.userMapper.selectList(wrapper);
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    @Test
+    public void testLike() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        //SELECT id,user_name,password,name,age,email FROM tb_user WHERE name LIKE ?
+        //Parameters: %曹%(String)
+        wrapper.like("name", "曹");
+        List<User> users = this.userMapper.selectList(wrapper);
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    //排序
+    @Test
+    public void testOrder() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        //SELECT id,user_name,password,name,age,email FROM tb_user ORDER BY age DESC
+        wrapper.orderByDesc("age");
+        List<User> users = this.userMapper.selectList(wrapper);
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    //or
+    @Test
+    public void testOr() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        //SELECT id,user_name,password,name,age,email FROM tb_user WHERE name = ? OR age = ?
+        wrapper.eq("name","李四").or().eq("age", 24);
+        List<User> users = this.userMapper.selectList(wrapper);
+        for (User user : users) {
+            System.out.println(user);
+        }
+    }
+
+    //指定查询字段
+    @Test
+    public void testSelect() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        //SELECT id,name,age FROM tb_user WHERE name = ? OR age = ?
+        wrapper.eq("name","李四").or().eq("age", 24).select("id","name","age");
+        List<User> users = this.userMapper.selectList(wrapper);
+        for (User user : users) {
+            System.out.println(user);
+        }
     }
 }
